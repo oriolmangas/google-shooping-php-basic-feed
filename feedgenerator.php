@@ -1,17 +1,26 @@
 <?php
-ini_set('memory_limit', '9999999999');
-set_time_limit(3600);
-require_once(dirname(__FILE__) . '/../config/ProjectConfiguration.class.php');
-$configuration = sfApplicationConfiguration::getApplicationConfiguration('frontend', 'dev', true);
-//$configuration = ProjectConfiguration::getApplicationConfiguration('frontend', 'dev', true);
-sfContext::createInstance($configuration);
-// Borra las dos líneas siguientes si no utilizas una base de datos
-$databaseManager = new sfDatabaseManager($configuration);
-$databaseManager->loadConfiguration();
-sfContext::getInstance()->getConfiguration()->loadHelpers(array('I18N', 'Asset', 'Url', 'Tag'));
+
+/* 
+ * By Oriol Mangas Abellan, PHP Web Developer 
+ * comments please email me on oriolmangas@gmail.com
+ * 
+ * Simple way to generate a simple google shooping feed
+ * 
+ * feedshooping($products); generates de feed
+ * 
+ * generatefile(); // save the file as .txt, separator are "\n" (tab) and end of line "\n"
+ *
+ */
+
 
 include 'shoopingfuncs.php';
 
-$feed_generado = feedshooping();
+// what we need 
+// $products  => Array of all products with the minimum information, look shoopingfuncs.php.
+// $folder    => file directory where you want to save the feed
+// $name_file => final name for feeds file
+        
+$feed       = feedshooping($products);  // returns the feed or false
 
+$error_file = generatefile($folder, $name_file, $feed);  // returns true or false
 

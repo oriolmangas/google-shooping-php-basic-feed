@@ -1,119 +1,76 @@
 <?php
 
-function feedshooping() {
+// Generates the feed
+// Need object array of all products, modify ( gets ) in this function to adapt to you case
 
-    $url = 'http://www.farmaciacalabria.com/producto/';
-    $url_image = 'http://www.farmaciacalabria.com/uploads/gallery/thumbs/';
-    $folder = $_SERVER['DOCUMENT_ROOT'];
-    $url_feed = $folder . '../data/shooping/';
-    $culture = 'es';
+function feedshooping($products) {
+
     $feed_productos = "";
-    $feed_cabercera = 'id' . "\t" . 'título' . "\t" . 'marca' . "\t" . 'descripción' . "\t" . 'enlace' . "\t" . 'estado' . "\t" . 'precio' . "\t" . 'disponibilidad' . "\t" . 'enlace imagen' . "\t" . 'mpn' . "\t" . 'categoría en google product' . "\t" . 'categoría' . "\n";
 
-    $query = Doctrine_Query::create()
-            ->from('Producto p')
-            ->leftJoin('p.Translation t')
-            ->andWhere('t.lang = ?', $culture)
-            ->andWhere('p.estado = 1')
-            ->andWhere('p.precio > 0');
-    $productos = $query->execute();
+    $feed_header = 'id' . "\t" . 'title' . "\t" . 'brand' . "\t" . 'description' . "\t" . 'link' . "\t" . 'condition' . "\t" . 'price' . "\t" . 'availability' . "\t" . 'image link' . "\t" . 'mpn' . "\t" . 'google product category' . "\t" . 'category' . "\n";
 
-    foreach ($productos as $p) {
-        $categoriaGoogle = generacategoriaGoogle($p->getId(), $culture);
-
-        if ($categoriaGoogle) {
-            $categoriaWeb = generacategoriaWeb($p->getId(), $culture, $categoriaGoogle);
-            $link_prod = $url . $p->getSlug();
-            $img_prod = $url_image . '450_' . $p->getSlug() . '.jpg';
-            $nombre = $p->getNombre();
-            $ref = generampn($p->getReferencia());
-            $precio = $p->getPrecio();
-            $estado = 'nuevo';
-            $stock = 'en stock';
-            $id = $p->getId() . $culture;
-            $marca = html_entity_decode($p->getMarca(), ENT_QUOTES, 'UTF-8');
-            $descripcion = generadescripcion($p->getDescripcion());
-            $feed_productos = $feed_productos . $id . "\t" . $nombre . "\t" . $marca . "\t" . $descripcion . "\t" . $link_prod . "\t" . $estado . "\t" . $precio . "\t" . $stock . "\t" . $img_prod . "\t" . $ref . "\t" . $categoriaGoogle->getCategoriaGoogleShooping() . "\t" . $categoriaWeb . "\n";
-        }
+    foreach ($products as $product) {
+        
+        $product_id      = $product->getName();          // Reference in your website
+        $name            = $product->getName();
+        $reference       = $product->getReference();     // Reference mpn ( you can use ean if you want )
+        $price           = $product->getPrice();         // example '55.23';
+        $condition       = $product->getCondition();     // example 'new';
+        $availability    = $product->getAvailability();  // example 'in stock';
+        $brand           = $product->getBrand();         // example 'Sony'
+        $description     = cleandescription($product->getDescription());  // Cleaned desription
+        $categoryWeb     = $product->getCategoryURL(); // category in your website, for exmple    Media > DVDs & Movies > Television Shows
+        $categoryGS      = $prodcut->getCategoryGS();  // category in Google Shooping, look http://www.google.com/basepages/producttype/taxonomy.en-US.txt. example = DVDs & Movies > TV Series > Fantasy Drama
+        $link            = $prodcut->getLink();        // final url for product, example http://www.example.com/media/dvd/?sku=384616&src=gshopping&lang=en
+        $link_img        = $prodcut->getLinkImg();     // iage url, example http://images.example.com/DVD-0564738?size=large&format=PNG
+    
+        $feed_products   = $feed_products . $product_id . "\t" . $name . "\t" . $brand . "\t" . $description . "\t" . $link . "\t" . $condition . "\t" . $price . "\t" . $availability . "\t" . $link_img . "\t" . $reference . "\t" . $categoryGS . "\t" . $categoryWeb . "\n";
+    
     }
+    
+    if($feed_products){
+        return ($feed_products);
+    }else{
+        return ('false');
+    }
+ 
+}
 
+
+
+// Generates de file in memory as .txt
+
+function generatefile($folder, $name_file, $feed) {
+
+    $feed_generated = 'false';
+    
     try {
-        $fichero = fopen($url_feed . 'shooping_' . $culture . '.txt', 'w');              // Abrir el archivo para escribir contenido
-        $errorw = fwrite($fichero, $feed_cabercera . $feed_productos);        // Escribir en el archivo
-        $errorc = fclose($fichero);
-        $feed_generado = 'true';
+        $file   = fopen($folder . $name_file . '.txt', 'w');    // open file          
+        $errorw = fwrite($file, $feed_head . $feed_body);     // write file
+        $errorc = fclose($file);                              // close file
+        $feed_generated = 'true';
     } catch (Exception $e) {
-        $feed_generado = 'false';
+        $feed_generated = 'false';
     }
 
     if ($feed_generado == 'true') {
-        echo('feed  generado' . "\n");
+        echo('feed  generated' . "\n");
         return('true');
     } else {
-        echo('Error en la generacion del fichero' . "\n" . 'ERROR: ' . $e . "\n");
+        echo('Generating error' . "\n" . 'ERROR: ' . $e . "\n");
         return('false');
     }
 }
 
-function generadescripcion($descripcioncortada) {
 
-    $descripcioncortada = str_replace('<strong>Descripci&oacute;n</strong>', "", $descripcioncortada);
-    $descripcioncortada = str_replace('<strong>Cantidad</strong>', "", $descripcioncortada);
+
+// we have to clean our description to avoid html tags and "\t" or "\n".
+
+function cleandescription($descripcion) {
+
     $descripcion = strip_tags($descripcioncortada);
     $descripcion = html_entity_decode($descripcion, ENT_QUOTES, 'UTF-8');
     $descripcion = eregi_replace("[\n|\r|\n\r]", ' ', $descripcion);
 
     return ($descripcion);
-}
-
-function generampn($ref) {
-    $mpn = '';
-    $aux = strrev($ref);
-    $pos = strpos($aux, ' ');
-    $mpn = substr($aux, 0, $pos);
-    $mpn = strrev($mpn);
-    $mpn = str_replace(".","",$mpn);
-
-    return($mpn);
-}
-
-function generacategoriaGoogle($id, $culture) {
-    $shopcat = NULL;
-    $query = Doctrine_Query::create()
-            ->from('Categorias c')
-            ->leftJoin('c.Translation t')
-            ->andWhere('t.lang = ?', $culture)
-            ->leftJoin('c.CategoriaProducto ct')
-            ->andWhere('ct.producto_id = ?', $id)
-            ->andWhere('c.estado = 1');
-    $categorias = $query->execute();
-
-    foreach ($categorias as $categoria) {
-        if ($categoria->getCategoriaGoogleShooping() AND $categoria->getCategoriaGoogleShooping() != '' AND $categoria->getCategoriaGoogleShooping() != ' ') {
-            $shopcat = $categoria;
-            break;
-        }
-    }
-    return ($shopcat);
-}
-
-function generacategoriaWeb($id, $culture, $categoria) {
-
-    if ($categoria) {
-        $categoriaweb = '';
-        $miarray = array();
-        $miarray[] = $categoria->getNombre();
-        $padre = $categoria->getPadre();
-        while ($padre != NULL) {
-            $miarray[] = $padre->getNombre();
-            $padre = $padre->getPadre();
-        }
-        $miarray = (array_reverse($miarray));
-        foreach ($miarray as $array) {
-            $categoriaweb = $categoriaweb . $array . ' > ';
-        }
-        $categoriaweb = substr($categoriaweb, 0, -3);
-    }
-
-    return ($categoriaweb);
 }
