@@ -1,4 +1,4 @@
-/* 
+
  * By Oriol Mangas Abellan, PHP Web Developer 
  * comments please email me on oriolmangas@gmail.com
  * 
@@ -7,8 +7,7 @@
  * feedshooping($products); generates de feed
  * 
  * generatefile(); // save the file as .txt, separator are "\n" (tab) and end of line "\n"
- *
- */
+
 
 
 include 'shoopingfuncs.php';
