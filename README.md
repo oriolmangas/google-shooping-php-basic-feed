@@ -8,18 +8,20 @@
  * 
  * generatefile(); // save the file as .txt, separator are "\n" (tab) and end of line "\n"
 
-
+first step include and adapt the shoopingfuncs.php file
 
 include 'shoopingfuncs.php';
 
-// what we need 
-// $products  => Array of all products with the minimum information, look shoopingfuncs.php for and example.
-// $folder    => file directory where you want to save the feed
-// $name_file => final name for feeds file
+ what we need 
+
+$products  => Array of all products with the minimum information, look shoopingfuncs.php for and example.
+$folder    => file directory where you want to save the feed
+$name_file => final name for feeds file
+
 
 basic information in this generator:
 
-feed_header => id + title + brand + description + link + condition + price + availability + image link + mpn + google product category + category
+  feed_header => id + title + brand + description + link + condition + price + availability + image link + mpn + google product category + category
 
 if you need to introduce more information the the feed have a look in the specifications in google shooping
 
