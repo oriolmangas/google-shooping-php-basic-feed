@@ -22,5 +22,5 @@ include 'shoopingfuncs.php';
         
 $feed       = feedshooping($products);  // returns the feed or false
 
-$error_file = generatefile($folder, $name_file, $feed);  // returns true or false
+$file_generated = generatefile($folder, $name_file, $feed);  // returns true or false
 
