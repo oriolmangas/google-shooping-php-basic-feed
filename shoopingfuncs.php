@@ -11,7 +11,7 @@ function feedshooping($products) {
 
     foreach ($products as $product) {
         
-        $product_id      = $product->getName();          // Reference in your website
+        $product_id      = $product->getId();          // Reference in your website
         $name            = $product->getName();
         $reference       = $product->getReference();     // Reference mpn ( you can use ean if you want )
         $price           = $product->getPrice();         // example '55.23';
