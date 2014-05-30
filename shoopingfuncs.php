@@ -53,25 +53,24 @@ function generatefile($folder, $name_file, $feed) {
         $feed_generated = 'false';
     }
 
-    if ($feed_generado == 'true') {
+    if ($feed_generated) {
         echo('feed  generated' . "\n");
-        return('true');
     } else {
-        echo('Generating error' . "\n" . 'ERROR: ' . $e . "\n");
-        return('false');
+        echo('Some error generating the feed.' . "\n" . 'ERROR: ' . $e . "\n");
     }
+    return($feed_generated);
 }
 
 
 
-// we have to clean our description to avoid html tags and "\t" or "\n".
+// we need to clean our description to aliminate html tags.
 
-function cleandescription($descripcion) {
+function cleandescription($description) {
 
-    $descripcion = strip_tags($descripcioncortada);
-    $descripcion = html_entity_decode($descripcion, ENT_QUOTES, 'UTF-8');
-    $descripcion = eregi_replace("[\n|\r|\n\r]", ' ', $descripcion);
-    $descripcion = trim($descripcion);
+    $description = strip_tags($description);
+    $description = html_entity_decode($description, ENT_QUOTES, 'UTF-8');
+    $description = eregi_replace("[\n|\r|\n\r]", ' ', $description);
+    $description = trim($description);
 
-    return ($descripcion);
+    return ($description);
 }
