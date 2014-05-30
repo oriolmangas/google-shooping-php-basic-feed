@@ -6,7 +6,7 @@
  * 
  * feedshooping($products); generates de feed
  * 
- * generatefile(); // save the file as .txt, separator are "\n" (tab) and end of line "\n"
+ * generatefile(); => save the file as .txt, separators are "\t" (tab) and end of line "\n"
 
 first step include and adapt the shoopingfuncs.php file
 
