@@ -71,6 +71,7 @@ function cleandescription($descripcion) {
     $descripcion = strip_tags($descripcioncortada);
     $descripcion = html_entity_decode($descripcion, ENT_QUOTES, 'UTF-8');
     $descripcion = eregi_replace("[\n|\r|\n\r]", ' ', $descripcion);
+    $descripcion = trim($descripcion);
 
     return ($descripcion);
 }
