@@ -29,7 +29,7 @@ function feedshooping($products) {
     }
     
     if($feed_products){
-        return ($feed_products);
+        return ($feed_header.$feed_products);
     }else{
         return ('false');
     }
@@ -46,7 +46,7 @@ function generatefile($folder, $name_file, $feed) {
     
     try {
         $file   = fopen($folder . $name_file . '.txt', 'w');    // open file          
-        $errorw = fwrite($file, $feed_head . $feed_body);     // write file
+        $errorw = fwrite($file, $feed);     // write file
         $errorc = fclose($file);                              // close file
         $feed_generated = 'true';
     } catch (Exception $e) {
